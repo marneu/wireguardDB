@@ -2,7 +2,7 @@ Wireguard Database Connector Overview
 =====================================
 Development Status: 0.1.7 (alpha)
 
-First of I like to thank Jared McKnight for
+First of all, I'd like to thank Jared McKnight for
 [wireguard](https://github.com/fictivekin/wireguard) who inspired me to make
 this AddOn.
 
