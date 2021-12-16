@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Cython debug symbols
+cython_debug/
+
+# ---> editor
+*~
+*.bak
