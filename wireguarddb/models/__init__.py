@@ -10,4 +10,4 @@ __status__ = "Development"
 # pylint: disable=import-error
 from .config import DBConfig  # pylint disable=import-error
 from .database import DBConnect  # pylint disable=import-error
-from .tables import MODELS, WGServer, WGPeer, WGPeerRelation
+from .tables import MODELS, WGData, WGRelation
