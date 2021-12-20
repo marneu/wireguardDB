@@ -1,7 +1,11 @@
 from pathlib import Path
 import pytest
-from wireguardDB.models.config import DBConfig
-from wireguardDB.models.constants import CONFIG_PATH, DBCONFIG_FILE
+
+# noinspection PyUnresolvedReferences
+from wireguard_db.models.config import DBConfig
+
+# noinspection PyUnresolvedReferences
+from wireguard_db.models.constants import CONFIG_PATH, DBCONFIG_FILE
 
 
 def test_write_db_config():

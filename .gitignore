@@ -135,3 +135,5 @@ cython_debug/
 *~
 *.bak
 code_checkup.sh
+.pre-commit-config.yaml
+.pylintrc

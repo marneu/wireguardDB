@@ -8,8 +8,8 @@ this AddOn.
 
 The Wireguard Database Connector makes use of the ORM peewee,
 providing a broader approach to several database systems.
-
-DB Field & Function policy: Only compatible fields/functions are used to support migrations from one to the other.
+Focused within this project is to store a wireguard configuration with import of configuration files.
+Checks for a wireguard configuration are done using the optional, but strongly recommended, python module (see above).
 
 Database backends tested for far:
 * sqlite3
@@ -19,11 +19,13 @@ Database backends tested for far:
 
 In most cases the use of cython is recommended.
 
+*DB Field & Function policy:* Only compatible fields/functions among the DB types are used to support migrations from one to the other.
+
 For more known python modules consult the peewee documentation:
 <https://docs.peewee-orm.com/en/latest/peewee/database.html>
 
-Quick Start using Database
---------------------------
+Quick Start using a database
+----------------------------
 ### First run on python3 (=>3.6)
 One the first create a default configfile at */etc/wireguard/wireguard.yaml*
 ```python3
@@ -45,16 +47,27 @@ any other of the sections for other adpters.
 The default */etc/wireguard/wireguard.yaml* should be self
 explaining for those used in working with databases on a system level.
 #### Test a connection to your database
+You do not need to create the tables, *DBConnect()* will create these, if the tables do not exist.
+Using *python* again, you can now try:
 ```python3
-from wireguardDB.models import DBConfig, DBConnect
+from wireguardDB.models import DBConfig, DBConnect, WGData, WGRelation
 # try a connection
-# in short
-db = DBConnect().set(DBConfig.read())
-# is
-setup = DBConfig.read()
-db = DBConnect().set(setup)
+# in short for the default sqlite3 adapter
+db = DBConnect(DBConfig.read()).get()
+server = WGData()
+relation = WGRelation()
+# try a different database, fi it is set up.
+setup = DBConfig.read('mysql')
+db_mysql = DBConnect(setup).get()
+my_server = WGData()
+relation = WGRelation()
+# both result in a peewee DatabaseProxy() object
+# which are assigned to the tables.
 ```
+Depending on the adapter one should now find empty tables in the database.
+Your setup should be completed at this step.
 ### Further reading
-* [Tutorial](docs/Tutorial.md)
+[comment]: <> ([Tutorial](docs/Tutorial.md)
+* [wireguardDB installation](docs/README-DB.md)
 * [peewee documentation](http://docs.peewee-orm.com/en/latest/)
 * python module [wireguard](https://github.com/fictivekin/wireguard/blob/master/README.rst)
