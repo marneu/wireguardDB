@@ -29,7 +29,7 @@ Quick Start using a database
 ### First run on python3 (=>3.6)
 One the first create a default configfile at */etc/wireguard/wireguard.yaml*
 ```python3
-from wireguardDB.models.config import DBConfig
+from wireguard_db.models.config import DBConfig
 # now enshure you can write and read the config.yaml
 # it will create a /etc/wireguard/wireguard.yaml file
 if DBConfig().write():
@@ -50,14 +50,14 @@ explaining for those used in working with databases on a system level.
 You do not need to create the tables, *DBConnect()* will create these, if the tables do not exist.
 Using *python* again, you can now try:
 ```python3
-from wireguardDB.models import DBConfig, DBConnect, WGData, WGRelation
+from wireguard_db.models import DBConfig, DBConnect, WGData, WGRelation
 # try a connection
 # in short for the default sqlite3 adapter
 db = DBConnect(DBConfig.read()).get()
 server = WGData()
 relation = WGRelation()
-# try a different database, fi it is set up.
-setup = DBConfig.read('mysql')
+# try a different database, if this is your db.
+setup = DBConfig().read(config_adapter='mysql')
 db_mysql = DBConnect(setup).get()
 my_server = WGData()
 relation = WGRelation()
@@ -66,6 +66,31 @@ relation = WGRelation()
 ```
 Depending on the adapter one should now find empty tables in the database.
 Your setup should be completed at this step.
+#### Create a simple server row
+```python3
+dbData = WGData()
+dbData.config_type = 'Server'   # only one of Server, Peer, Switch
+dbData.description = 'test-wg33'
+# ATOW wireguard model isn't capable
+# to add more than one IP to one interface
+dbData.Address = '192.168.0.1/24'
+if not dbData.save():
+    print('could not add the row')
+# check within your DB that a table row exists
+```
+It's time to create a real server config from this row.
+```python3
+from wireguard_db.utils import dicts
+# the row is still active, retrieve a dict
+row = dbData.get_dict()
+# translate db row to parameters
+wireguard_params = wgdata2wireguard(row)
+print(wireguard_params)
+
+from wireguard.server import Server
+subnet = wireguard_params.pop('address')
+server = Server(dbData.description, subnet, **wireguard_params)
+```
 ### Further reading
 [comment]: <> ([Tutorial](docs/Tutorial.md)
 * [wireguardDB installation](docs/README-DB.md)

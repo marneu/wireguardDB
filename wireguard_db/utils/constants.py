@@ -2,7 +2,6 @@
 
 DB_WIREGUARD_PARAMS_MAP = {
     # DB field : wireguard parameter
-    "Address":  "address",
     "ListenPort": "port",
     "PrivateKey": "private_key",
     "PublicKey": "public_key",

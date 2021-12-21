@@ -4,7 +4,7 @@ __license__ = "GPLv3"
 __docformat__ = "reStructuredText"
 
 import sys
-from peewee import DatabaseProxy, SqliteDatabase, MySQLDatabase, PostgresqlDatabase
+from peewee import SqliteDatabase, MySQLDatabase, PostgresqlDatabase
 from .constants import HAS_SQLITE3, HAS_POSTGRES, HAS_MYSQL
 from .tables import database, MODELS
 

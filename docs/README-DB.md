@@ -43,13 +43,20 @@ mysql:
 If *mysql* is not set within '*defaults*' section,
 you have to pass the parameter to *DBconfig().read()*:
 ```python3
-from wireguardDB.models.config import DBConfig
+from wireguard_db.models.config import DBConfig
 # set config
-setup = DBConfig().read('mysql')
+setup = DBConfig().read(config_adapter='mysql')
 # set dbconfig and connect
 setup
 exit()
 ```
+## Extending tables
+**NOTE:** I don't recommend expanding base tables.
+Better to create your own table and set a foreign key for the id field
+to add what you need to your table.
+If you insist on adding fields, don't start the field name with an uppercase letter,
+these are used for configuration and can be disruptive.
+
 ## Ubuntu 20.04 Findings
 ### PostgreSQL
 To use *psycopg2* you should have postgresql installed:
