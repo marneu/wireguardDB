@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+__version__ = "0.1.8"
+__license__ = "GPLv3"
+__docformat__ = "reStructuredText"
 
 from datetime import datetime
 from peewee import (
@@ -10,7 +13,6 @@ from peewee import (
     TextField,
     DateTimeField,
     ForeignKeyField,
-    Check,
 )
 
 
@@ -53,51 +55,50 @@ class BaseModel(Model):  # pylint: disable=too-few-public-methods
 class WGData(BaseModel):
     """
     wireguard config data derived from peewee.Model
-    Fieldnames beginning with an uppercase letter are used for configuration
+    Fieldnames beginning with 'wg_' are used for configuration
+    :field config_class: class used to construct the configuration
     """
-
-    config_type = CharField(
-        max_length=8, constraints=[Check('config_type in ("Server","Peer","Switch")')]
-    )
+    # wireguard model required
+    config_class = CharField(max_length=24, null=True)
     description = CharField(max_length=80)
-    Interface = CharField(max_length=8, null=True, index=True)
-    Address = CharField(index=True)
-    SaveConfig = BooleanField(null=True)
-    DNS = CharField(max_length=64, null=True)
-    PublicKey = CharField(max_length=48, null=True, unique=True)
-    PrivateKey = CharField(max_length=48, null=True, unique=True)
-    PresharedKey = CharField(max_length=48, null=True)
-    Endpoint = CharField(null=True, index=True)
-    ListenPort = IntegerField(null=True)
-    AllowedIPs = CharField(null=True)
-    PersistentKeepalive = IntegerField(null=True)
-    PreUp = TextField(null=True)
-    PreDown = TextField(null=True)
-    PostUp = TextField(null=True)
-    PostDown = TextField(null=True)
-    Table = CharField(max_length=10, null=True)
-    MTU = IntegerField(null=True)
-    host = CharField(max_length=128, index=True, default="localhost")
-    notes = TextField(null=True)
+    # only wg_ fields are used within a config file
+    wg_interface = CharField(max_length=8, null=True, index=True)
+    wg_address = CharField(index=True)
+    wg_saveconfig = BooleanField(null=True)
+    wg_dns = CharField(null=True)
+    wg_publickey = CharField(max_length=48, null=True)
+    wg_privatekey = CharField(max_length=48, null=True, unique=True)
+    wg_presharedkey = CharField(max_length=48, null=True)
+    wg_endpoint = CharField(null=True, index=True)
+    wg_listenport = IntegerField(null=True)
+    wg_allowedips = CharField(null=True)
+    wg_persistentkeepalive = IntegerField(null=True)
+    wg_preup = TextField(null=True)
+    wg_postup = TextField(null=True)
+    wg_predown = TextField(null=True)
+    wg_postdown = TextField(null=True)
+    wg_table = CharField(max_length=10, null=True)
+    wg_mtu = IntegerField(null=True)
+    # service part
+    is_enabled = BooleanField(default=True)
     is_connected = BooleanField(default=False)
-    read_only = BooleanField(default=False)
-    enabled = BooleanField(default=True)
+    # revision part
+    is_readonly = BooleanField(default=False)
     updated = DateTimeField(default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     created = DateTimeField(default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    # other ref: ref to a host table if you use this
+    host_id = IntegerField(index=True, null=True)
 
-    def save(
-        self, *, force_insert: bool = False, only: list = None, updated: bool = False
-    ):  # pylint: disable=arguments-differ
+    def save(self, force_insert: bool = False, only: list = None):
         """
-        simulate an on_updated timestamp, and increment the counter
-        :param force_insert: bool: if False update is used
-        :param only: list: list of fields to update/insert
-        :param updated: bool: set updated time stamp
-        :returns: table
-        :rtype: object
+        Simulates an on_updated timestamp, and takes care of insert/update behaviour
+        :param force_insert: bool: Force INSERT query
+        :param only: list/tuple: optional list of fields to be updated/inserted.
+        :returns: Number of rows modified.
+        :rtype: int
         """
 
-        force_insert = self.id is None
+        # if this row is new (id=None), default will apply
         if not force_insert:
             self.updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -107,26 +108,23 @@ class WGData(BaseModel):
         """
         mostly derived from BaseModel
         """
-
         table_name = "WGData"
 
 
 class WGRelation(BaseModel):
     """
-    relation between server/peers or peer to peer (1-1), derived from peewee.Model
+    Relation between server/peers or peer to peer (1-1)
     """
-
-    wireguardServer = ForeignKeyField(WGData, backref="Server")
-    wireguardPeer = ForeignKeyField(WGData, backref="PeerPartner")
+    WGParent = ForeignKeyField(WGData, backref="Parent")
+    WGPeer = ForeignKeyField(WGData, backref="Peer")
     created = DateTimeField(default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     class Meta:  # pylint: disable=too-few-public-methods
         """
         mostly derived from BaseModel
         """
-
         table_name = "WGRelation"
-        indexes = ((("wireguardServer", "wireguardPeer"), True),)
+        indexes = ((("WGParent", "WGPeer"), True),)
 
 
 MODELS = (WGData, WGRelation)
