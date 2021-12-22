@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 __license__ = "GPLv3"
 __docformat__ = "reStructuredText"
 
 import sys
+
+import peewee
 from peewee import SqliteDatabase, MySQLDatabase, PostgresqlDatabase
-from .constants import HAS_SQLITE3, HAS_POSTGRES, HAS_MYSQL
-from .tables import database, MODELS
+from .constants import HAS_SQLITE3, HAS_POSTGRES, HAS_MYSQL  # pylint: disable=E0402
+from .tables import database, MODELS  # pylint: disable=E0402
 
 
 class DBConnect:
@@ -30,7 +32,7 @@ class DBConnect:
             # full init if setup is given
             self.set(setup)
 
-    def set(self, setup: tuple):
+    def set(self, setup: tuple) -> None:
         """
         Sets the corresponding peewee connector for the requested database
         :param setup: tuple: as returned from DBConfig.read()
@@ -78,7 +80,7 @@ class DBConnect:
         self._database = database
         self.check()
 
-    def get(self):
+    def get(self) -> peewee.DatabaseProxy:
         """
         Get the connected database proxy object
         :returns: peewee.DatabaseProxy (injected into tables)
@@ -95,7 +97,7 @@ class DBConnect:
         return self._database
 
     @property
-    def connected(self):
+    def connected(self) -> str:
         """
         Return connection state
         :returns: True if connected
@@ -104,7 +106,7 @@ class DBConnect:
         return self._connected
 
     @property
-    def adapter(self):
+    def adapter(self) -> str:
         """
         Returns the used adapter
         :returns: adapter name as in config
@@ -112,17 +114,17 @@ class DBConnect:
         """
         return self._adapter
 
-    def check(self):
+    def check(self) -> None:
         """
         Sanitizer: checks and creates tables, if they do not exist
         :returns: None
         """
-        for table in MODELS:
-            table.validate_model()
-            table.create_table(safe=True)
+        for dbtable in MODELS:
+            dbtable.validate_model()
+            dbtable.create_table(safe=True)
         self._connected = True
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the database and set connected to False
         :returns: None
@@ -130,9 +132,9 @@ class DBConnect:
         self._database.close()
         self._connected = False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
-        Show use adapter and connected state
+        Returns used adapter and connected state
         :returns: a text line
         :rtype: str
         """

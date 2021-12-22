@@ -51,11 +51,14 @@ setup
 exit()
 ```
 ## Extending tables
-**NOTE:** I don't recommend expanding base tables.
-Better to create your own table and set a foreign key for the id field
+**NOTE:** It's not recommended expanding the base table with fields not 
+defined within the tables model.
+
+Better you create your own table and set a foreign key for the id field
 to add what you need to your table.
-If you insist on adding fields, don't start the field name with an uppercase letter,
+If you insist on adding fields, do **not** start the field name with *'wg_'*,
 these are used for configuration and can be disruptive.
+Also, either set a default value or allow *NULL* otherwise things will break.
 
 ## Ubuntu 20.04 Findings
 ### PostgreSQL

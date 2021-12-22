@@ -59,8 +59,8 @@ relation = WGRelation()
 # try a different database, if this is your db.
 setup = DBConfig().read(config_adapter='mysql')
 db_mysql = DBConnect(setup).get()
-my_server = WGData()
-relation = WGRelation()
+dbData = WGData()
+dbRelation = WGRelation()
 # both result in a peewee DatabaseProxy() object
 # which are assigned to the tables.
 ```
@@ -69,13 +69,12 @@ Your setup should be completed at this step.
 #### Create a simple server row
 ```python3
 dbData = WGData()
-dbData.config_type = 'Server'   # only one of Server, Peer, Switch
 dbData.description = 'test-wg33'
-# ATOW wireguard model isn't capable
+# REVIEW: ATOW wireguard model isn't capable
 # to add more than one IP to one interface
-dbData.Address = '192.168.0.1/24'
-if not dbData.save():
-    print('could not add the row')
+dbData.wg_address = '192.168.0.1/24'
+if 1 == dbData.save():
+    print('Could not add the row')
 # check within your DB that a table row exists
 ```
 It's time to create a real server config from this row.

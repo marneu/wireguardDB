@@ -2,7 +2,7 @@
 Provides configuration create, check and read for a connector
 """
 # -*- coding: utf-8 -*-
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 __license__ = "GPLv3"
 __docformat__ = "reStructuredText"
 
@@ -33,7 +33,7 @@ class DBConfig:
         self._setup = None
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         """
         Gets (and sets) the config filename for use with read/write.
         :returns: full path db config filename
@@ -66,9 +66,7 @@ class DBConfig:
 
         self._configfile = configfile
 
-    def read(
-        self, *, config_adapter: str = "defaults", config_file: str = "default"
-    ):  # pylint: disable=too-many-branches
+    def read(self, *, config_adapter: str = "defaults", config_file: str = "default") -> tuple:  # pylint: disable=too-many-branches
         """
         Reads a config file
         :param config_adapter: str, optional: any of
@@ -147,24 +145,24 @@ class DBConfig:
         return self._setup
 
     @property
-    def getadapter(self):
+    def getadapter(self) -> str:
         """
-        Get adapter name
-        :returns: adapter name
+        Gets the adapter name
+        :returns: adapter type as name
         :rtype: str
         """
         return self._adapter
 
     @property
-    def getsetup(self):
+    def getsetup(self) -> tuple:
         """
-        Get setup
+        Gets the setup tuple
         :returns: setup for adapter
         :rtype: tuple
         """
         return self._setup
 
-    def write(self, *, overwrite: bool = False):
+    def write(self, *, overwrite: bool = False) -> bool:
         """
         Writes the configfile:
           If a read() was issued before, a plain setup block for this adapter will be written.
@@ -185,8 +183,7 @@ class DBConfig:
 
         with self._configfile.open("w", encoding="utf8") as configfile:
 
-            if not bool(self._setup):
-
+            if not isinstance(self._setup, tuple):
                 config = SAMPLE_CONFIG
                 configfile.write(config)
 
@@ -200,3 +197,5 @@ class DBConfig:
                 )
 
             return True
+
+        return False
